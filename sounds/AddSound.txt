@@ -1,0 +1,50 @@
+http://www.onlywebpro.com/2012/03/10/html5-game-development-adding-sound-effects/
+
+https://mixkit.co/free-sound-effects/game/
+
+===================
+
+add a sound folder
+find some .wav files that you like and place them in that folder
+
+in you index.js file, just before you define the image objects, add:
+
+
+var soundGameOver = "sounds/gameOver.wav"; //Game Over sound efx
+var soundCaught = "sounds/caught.wav"; //Game Over sound efx
+//Assign audio to soundEfx
+var soundEfx = document.getElementById("soundEfx");
+
+insert play sounds where you want them to happen
+
+if(monstersCaught === 5) {
+	alert("you won");
+	// change sound effect and play it.
+	soundEfx.src = soundGameOver;
+	soundEfx.play();
+}
+
+	// play sound when touch
+	//soundEfx.src = "sounds/caught.wav";
+	soundEfx.src = soundCaught ;
+	soundEfx.play();
+	++monstersCaught;
+
+======================================
+strange problem and solution below 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+</head>
+<body>
+    <h2>Catch the Coconuts</h2>
+    <!--  *******************Add this next line here*********************************** -->
+    <audio id="soundEfx"  style="display: none;"></audio>
+    <script src="index.js"></script>
+</body>
+</html>
+
