@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function() {
         })
     });
 
-    let text = "Welcome to the game! Let your hero, Mario, catch the stars!! But please avoid the dangerous Goombas. The stars will be moving around the screen, and you need to let Hero mario to catch Star correctly.  Watch out! There are also Piranha Plant scattered throughout the game. It is extremely deadly, and if you accidentally touch them, you will lose the game immediately. Avoid them at all costs! To control your character, use the arrow keys on your keyboard. Remember, your main goal is to catch the stars while avoiding the Goombas and the pinania flowers. Stay focused, be quick, and aim to get stars! Good luck!";
+    let text = "Welcome to the game! Let your hero, Mario, catch the stars!! But please avoid the dangerous Goombas. The stars will be moving around the screen, and you need to let Hero mario to catch Star correctly.  Watch out! There are also Piranha Plant scattered throughout the game. It is extremely deadly, and if you accidentally touch them, you will lose the game immediately. Avoid them at all costs! To control your character, use the arrow keys on your keyboard. Remember, your main goal is to catch 3 Stars while avoiding the Goombas and the pinania flowers. Stay focused, be quick, and aim to get stars! Good luck!";
     let index = 0;
     let interval = 90;
 
