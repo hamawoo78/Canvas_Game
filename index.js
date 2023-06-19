@@ -22,6 +22,8 @@ let chessBoard = [
     ['x','x','x','x','x','x','x','x','x'],
 ];
 
+let monsterNumber = 2;
+let MFNumber = 1;
 
 // Background image
 var bgReady = false;
@@ -57,22 +59,64 @@ heroImage.onload = function () {
 };
 heroImage.src = "images/mario.png";
 
-// Monster image
-var monsterReady = false;
-var monsterImage = new Image();
-monsterImage.onload = function () {
-    monsterReady = true;
-};
-monsterImage.src = "images/monster.png";
 
 
-// MonsterFlower image
-var MFReady = false;
-var MFImage = new Image();
-MFImage.onload = function () {
-    MFReady = true;
+// Star image
+var starReady = false;
+var starImage = new Image();
+starImage.onload = function () {
+    starReady = true;
 };
-MFImage.src = "images/MF.png";
+starImage.src = "images/star.png";
+
+
+
+// Define the Monster class
+class Monster {
+    constructor(x, y, speed) {
+      this.x = x;
+      this.y = y;
+      this.Speed = speed;
+      this.Ready = false;
+      this.Image = new Image();
+      this.Image.onload = () => {
+        this.Ready = true;
+      };
+      this.Image.src = "images/monster.png";
+    }
+}
+
+let monster = [];
+
+for (let numbers = 0; numbers < monsterNumber; numbers++)
+{
+    let one_monster = new Monster(0,0,200);
+    monster.push(one_monster);
+}
+
+// Define the MF (Piranha plant) class
+class PiranhaPlant {
+    constructor(x, y) {
+      this.x = x;
+      this.y = y;
+      this.Ready = false;
+      this.Image = new Image();
+      this.Image.onload = () => {
+        this.Ready = true;
+      };
+      this.Image.src = "images/MF.png";
+    }
+}
+
+let MF = [];
+
+for (let numbers = 0; numbers < MFNumber; numbers++)
+{
+    let one_MF = new PiranhaPlant(0,0);
+    MF.push(one_MF);
+}
+
+
 
 // done with laod images =================================
 
@@ -82,6 +126,10 @@ var soundGameStart = "sounds/game-opener.wav"; // game start
 var soundGameOver = "sounds/player-losing-or-failing.wav"; // game over 
 var soundHitMF = "sounds/blood-pop-slide.wav"; // hit floweer objects 
 var soundHitMonster = "sounds/punch.wav"; // hit monster objects 
+var soundGetStar = "sounds/GetStar.wav"; // game clear
+var soundStar = "sounds/star.wav"; // game clear
+ 
+
 // complete sound 
 
 // =============================================
@@ -94,18 +142,14 @@ var hero = {
     x: 0,  // where on the canvas are they?
     y: 0  // where on the canvas are they?
 };
-var monster = {
-// for this version, the monster does not move, so just and x and y
+
+var star = {
+    speed: 30,
     x: 0,
     y: 0
 };
-
-var MF = {
-    // for this version, the monster does not move, so just and x and y
-        x: 0,
-        y: 0
-};
-var monstersCaught = 0;
+var heroLife = 3;
+var Stars = 0;
 
 // animation
 var rows = 7;
@@ -113,6 +157,7 @@ var cols = 3;
 
 //second row for the right movement (counting the index from 0)
 var trackRight = 2;
+
 //third row for the left movement (counting the index from 0)
 var trackLeft = 5;
 var trackUp = 0; 
@@ -164,8 +209,6 @@ addEventListener("keyup", function (e) {
 
 // ==========================================================
 
-// functions go here
-
 // Update game objects
 let update = function (modifier) {
 
@@ -191,44 +234,117 @@ let update = function (modifier) {
         hero.x += hero.speed * modifier;
         right = true;
     }
-    
+
+// Moving items =============================================
+
+    // Move the monster
+    for(let i = 0; monster.length > i; i++)
+    {
+        
+        if(i % 2 === 0)
+        {
+            monster[i].x += monster[i].Speed * modifier;
+            if (monster[i].x < 50 || monster[i].x > canvas.width - 100 || monster[i].y < 50 || monster[i].y > canvas.height - 150) 
+            {
+                monster[i].Speed *= -1; 
+            }
+        }
+        else if(i === 3 || i === 4)
+        {
+            monster[i].x += monster[i].Speed * modifier;
+            monster[i].y += monster[i].Speed * modifier;
+            if (monster[i].x < 50 || monster[i].x > canvas.width  || monster[i].y < 50 || monster[i].y > canvas.height - 150) 
+            {
+                monster[i].Speed *= -1; 
+            }
+        } 
+        else
+        {
+            monster[i].y += monster[i].Speed * modifier;
+            if (monster[i].x < 50 || monster[i].x > canvas.width || monster[i].y < 50 || monster[i].y > canvas.height - 180) 
+            {
+                monster[i].Speed *= -1; 
+            }
+        }
+    }
+
+    // move star
+    star.x += star.speed * modifier;
+    star.y += star.speed * modifier;
+    if (star.x < 50 || star.x > canvas.width -50 || star.y < 50 || star.y > canvas.height - 180) 
+    {
+        star.speed *= -1; 
+    }
+// ==========================================================================================
+
 
 
     // Are they touching Goobas?
-    if (
-        hero.x <= (monster.x + 50)
-        && monster.x <= (hero.x + 50)
-        && hero.y <= (monster.y + 50)
-        && monster.y <= (hero.y +50)) 
-        {     
-            // console.log("hero x:" + hero.x + "hero y:" + hero.y + "monster y:" + monster.x + "monster y:" + monster.y)       
-            soundEfx.src = soundHitMonster;
-            soundEfx.play();   
-            ++monstersCaught;  // keep track of our “score”
-            if (monstersCaught == 3)
-            {
-                gameover = true;
-                win = true;
+    for(let i = 0; monster.length > i; i++)
+    {
+        if (
+            hero.x <= (monster[i].x + 40)
+            && monster[i].x <= (hero.x + 40)
+            && hero.y <= (monster[i].y + 40)
+            && monster[i].y <= (hero.y +40)) 
+            {     
                 soundEfx.src = soundHitMonster;
-                soundEfx.play(); 
+                soundEfx.play();   
+                heroLife--;  // keep track of Mario's life
+                if (heroLife == 0)
+                {
+                    soundEfx.src = soundGameOver;
+                    soundEfx.play(); 
+                    gameover = true;
+                    soundEfx.addEventListener("ended", function() {	        
+                        window.location.href = "htmls/lose.html";
+                    });
+                }
+            reset_MF();
             }
-            reset();       // start a new cycle
-        }
+    }
 
     // Are they touching MF?
-    if (
-        hero.x <= (MF.x + 50)
-        && MF.x <= (hero.x + 50)
-        && hero.y <= (MF.y + 50)
-        && MF.y <= (hero.y + 50)) 
-        {
-            
-            soundEfx.src = soundHitMF;
-            soundEfx.play();
-            gameover = true;	        
-            // alert("Game over");
-            reset();       // start a new cycle
+    for(let i = 0; MF.length > i; i++)
+    {
+        if (
+            hero.x <= (MF[i].x + 50)
+            && MF[i].x <= (hero.x + 50)
+            && hero.y <= (MF[i].y + 50)
+            && MF[i].y <= (hero.y + 50)) 
+            {
+                soundEfx.src = soundHitMF;
+                soundEfx.play();
+                gameover = true;
+                soundEfx.addEventListener("ended", function() {	        
+                    window.location.href = "htmls/MFgameover.html";
+                });
+            }
         }
+
+    // Are they touching star?    
+    if (
+        hero.x <= (star.x + 40)
+        && star.x <= (hero.x + 40)
+        && hero.y <= (star.y + 40)
+        && star.y <= (hero.y + 40)) 
+        {
+            soundEfx.src = soundStar;
+            soundEfx.play();   
+            Stars++;  // keep track of Mario's life
+            if (Stars == 3)
+                {
+                    soundEfx.src = soundGetStar;
+                    soundEfx.play();
+                    gameover = true;
+                    soundEfx.addEventListener("ended", function() {
+                        window.location.href = "/htmls/win.html";
+                    });
+                }
+            reset_star(); // Goomba will added
+        }
+
+
 
     curXFrame = ++curXFrame % frameCount; //Updating the sprite frame index
     // it will count 0,1,2,0,1,2,0, etc
@@ -275,9 +391,6 @@ let update = function (modifier) {
 
 };
 
-
-
-
 // Draw everything in the main render function
 let render = function () {
     if (bgReady) {
@@ -297,19 +410,42 @@ let render = function () {
         ctx.drawImage(heroImage, srcX, srcY, width, height, hero.x, hero.y, width, height);
     }
 
-    if (monsterReady) {
-        ctx.drawImage(monsterImage, monster.x, monster.y);
+    // if (MFReady) {
+    //     ctx.drawImage(MFImage, MF.x, MF.y);
+    // }
+
+    if (starReady) {
+        ctx.drawImage(starImage, star.x, star.y);
     }
 
-    if (MFReady) {
-        ctx.drawImage(MFImage, MF.x, MF.y);
+    // Score
+    ctx.fillStyle = "rgb(250, 250, 250)";
+    ctx.font = "24px Helvetica";
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+
+    ctx.fillStyle = "red";
+    ctx.fillText("Life: " + heroLife, 60,70);
+
+    ctx.fillStyle = "yellow";
+    ctx.fillText("Star: " + Stars, 60,100);
+    
+    for(let i = 0; monster.length > i; i++)
+    {
+        if (monster[i].Ready) 
+        {
+            ctx.drawImage(monster[i].Image, monster[i].x, monster[i].y);
+        }
     }
-        // Score
-        ctx.fillStyle = "rgb(250, 250, 250)";
-        ctx.font = "24px Helvetica";
-        ctx.textAlign = "left";
-        ctx.textBaseline = "top";
-        ctx.fillText("Goblins caught: " + monstersCaught, 0, 0);
+
+    for(let i = 0; MF.length > i; i++)
+    {
+        if (MF[i].Ready) 
+        {
+            ctx.drawImage(MF[i].Image, MF[i].x, MF[i].y);
+        }
+    }
+
 };
 
 let placeItem = function(charactor){
@@ -329,39 +465,51 @@ let placeItem = function(charactor){
     chessBoard[X][Y] = 'O';
     charactor.x = (X*100) +50;
     charactor.y = (Y*100) +60;
-    // charactor.x = 800;
-    // charactor.y = 700;
+
 
 }
 
 
 // Reset the game when the player catches a monster
-var reset = function () {
+var reset_MF = function () {
+
+    let one_MF = new PiranhaPlant(0,0);
+    MF.push(one_MF);
     placeItem(hero);
-    placeItem(monster);
-    placeItem(MF);
-    // if(died == ture)
-    // {
-    //     soundEfx.src = soundGameOver;
-    //     soundEfx.play();
-    // }
-    // else
-    // {
-    //     placeItem(hero);
-    //     placeItem(monster);
-    //     placeItem(MF);
-    // }
+    placeItem(star);
+    for(let i = 0; monster.length > i; i++)
+    { 
+        placeItem(monster[i]);
+    }
+    for(let i = 0; MF.length > i; i++)
+    { 
+        placeItem(MF[i]);
+    }
+    
 };
 
+// Reset the game when the player catches a monster
+var reset_star = function () {
 
+    let one_monster = new Monster(0,0,200);
+    monster.push(one_monster);
+    placeItem(hero);
+    // placeItem(MF);
+    placeItem(star);
+    for(let i = 0; monster.length > i; i++)
+    { 
+        placeItem(monster[i]);
+    }
+    for(let i = 0; MF.length > i; i++)
+    { 
+        placeItem(MF[i]);
+    }
+    
+};
 
 
 // The main game loop
 var main = function () {
-
-    // soundEfx.src = soundGameStart;
-    // soundEfx.play();
-
     if(gameover == false)
     {
         var now = Date.now();
@@ -372,15 +520,13 @@ var main = function () {
         //  Request to do this again ASAP
         requestAnimationFrame(main);
     }
-    else
+    else if(gameover == true)
     {
-        if(win == true)
-        {
-            alert("You win!")
+        star.speed = 0;
+        for (let i = 0; monster.length > i; i++) {
+            monster[i].Speed =0;
         }
-
     }
-
 };
 
 
@@ -390,5 +536,5 @@ var main = function () {
 // executing code
 // Let's play this game!
 var then = Date.now();
-reset();
+reset_star();
 main();  // call the main game loop.
