@@ -331,7 +331,7 @@ let update = function (modifier) {
         {
             soundEfx.src = soundStar;
             soundEfx.play();   
-            Stars++;  // keep track of Mario's life
+            Stars++;  // keep track of stars
             if (Stars == 3)
                 {
                     soundEfx.src = soundGetStar;
