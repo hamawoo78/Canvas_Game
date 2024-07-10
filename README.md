@@ -1,1 +1,1 @@
-#Get the start with Mario!
+#Get the star with Mario!
