@@ -338,7 +338,7 @@ let update = function (modifier) {
                     soundEfx.play();
                     gameover = true;
                     soundEfx.addEventListener("ended", function() {
-                        window.location.href = "/GetTheStarwithMario_Canvas_Game/win.html";
+                        window.location.href = "htmls/win.html";
                     });
                 }
             reset_star(); // Goomba will added
